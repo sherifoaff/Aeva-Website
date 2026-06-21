@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AEVA — Always Evolving, Always Alive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #fff2bd;
+      --blue: #285ccc;
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --grey: #f5f5f3;
+      --text-muted: #888;
+      --font-serif: 'Cormorant Garamond', serif;
+      --font-sans: 'Jost', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--white);
+      color: var(--black);
+      overflow-x: hidden;
+    }
+
+    /* ─── ANNOUNCEMENT BAR ─── */
+    .announcement {
+      background: var(--black);
+      color: var(--cream);
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--white);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+      position: relative;
+    }
+
+    .nav-left {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    /* Nav items with dropdown trigger */
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      color: var(--black);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      padding: 0 14px;
+      height: 64px;
+      transition: opacity 0.2s;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+
+    .nav-link:hover { opacity: 0.5; }
+
+    .nav-link svg { transition: transform 0.2s; }
+    .nav-item:hover .nav-link svg { transform: rotate(180deg); }
+
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: var(--black);
+      text-decoration: none;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--black);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-icon:hover { opacity: 0.5; }
+
+    /* ─── MEGA DROPDOWN ─── */
+    .dropdown {
+      position: absolute;
+      top: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--white);
+      border-top: 2px solid var(--black);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+      display: grid;
+      gap: 0;
+      min-width: 680px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-8px);
+      transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+      z-index: 300;
+    }
+
+    .nav-item:hover .dropdown,
+    .dropdown:hover {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Shop dropdown — 4 col */
+    .dropdown-shop {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Simple dropdown — 1 col */
+    .dropdown-simple {
+      grid-template-columns: 1fr;
+      min-width: 220px;
+      left: 0;
+      transform: translateX(0) translateY(-8px);
+    }
+
+    .nav-item:hover .dropdown-simple {
+      transform: translateX(0) translateY(0);
+    }
+
+    .dropdown-col {
+      padding: 32px 28px;
+      border-right: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .dropdown-col:last-child { border-right: none; }
+
+    .dropdown-col-title {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+
+    .dropdown-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dropdown-col ul li a {
+      text-decoration: none;
+      color: var(--black);
+      font-size: 13px;
+      font-weight: 400;
+      transition: color 0.15s, padding-left 0.15s;
+      display: block;
+    }
+
+    .dropdown-col ul li a:hover {
+      color: var(--blue);
+      padding-left: 4px;
+    }
+
+    .dropdown-col ul li a.highlight {
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    /* Dropdown featured image col */
+    .dropdown-featured {
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .dropdown-featured img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .dropdown-featured:hover img { transform: scale(1.04); }
+
+    .dropdown-featured-label {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      color: var(--white);
+    }
+
+    .dropdown-featured-label p {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+
+    .dropdown-featured-label h4 {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 300;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      height: 92vh;
+      min-height: 600px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      background: var(--black);
+    }
+
+    .hero-slides { position: absolute; inset: 0; }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .hero-slide.active { opacity: 1; }
+
+    .hero-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: brightness(0.6);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 0 64px 72px;
+      max-width: 680px;
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0.8;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(48px, 6vw, 88px);
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+
+    .hero-title em { font-style: italic; color: var(--cream); }
+
+    .hero-subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 420px;
+    }
+
+    .hero-cta-row { display: flex; gap: 16px; align-items: center; }
+
+    .btn-primary {
+      background: var(--cream);
+      color: var(--black);
+      padding: 14px 36px;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: var(--blue); color: var(--white); }
+
+    .btn-ghost {
+      color: var(--white);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.4);
+      padding-bottom: 2px;
+      transition: border-color 0.2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--white); }
+
+    .hero-dots {
+      position: absolute;
+      bottom: 32px;
+      right: 64px;
+      display: flex;
+      gap: 8px;
+      z-index: 3;
+    }
+
+    .hero-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .hero-dot.active { background: var(--cream); }
+
+    /* ─── CATEGORY STRIP ─── */
+    .category-strip { background: var(--grey); padding: 56px 48px; }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      font-weight: 500;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .category-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      aspect-ratio: 3/4;
+      background: var(--black);
+    }
+
+    .category-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease, filter 0.4s ease;
+      filter: brightness(0.65);
+    }
+
+    .category-card:hover img { transform: scale(1.04); filter: brightness(0.5); }
+
+    .category-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 32px 24px 24px;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+    }
+
+    .category-label h3 {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 400;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .category-label span {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ─── PRODUCTS ─── */
+    .products-section { padding: 72px 48px; }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 300;
+      line-height: 1.1;
+    }
+
+    .section-title em { font-style: italic; color: var(--blue); }
+
+    .view-all {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--black);
+      text-decoration: none;
+      border-bottom: 1px solid var(--black);
+      padding-bottom: 2px;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .view-all:hover { opacity: 0.4; }
+
+    .filter-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 36px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .filter-tab {
+      padding: 10px 20px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+      font-family: var(--font-sans);
+    }
+
+    .filter-tab:hover { color: var(--black); }
+    .filter-tab.active { color: var(--black); border-bottom-color: var(--black); }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px 20px;
+    }
+
+    .product-card {
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .product-img-wrap {
+      position: relative;
+      overflow: hidden;
+      background: var(--grey);
+      aspect-ratio: 3/4;
+      margin-bottom: 14px;
+    }
+
+    .product-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-img-wrap img { transform: scale(1.05); }
+
+    .product-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--blue);
+      color: var(--white);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 4px 10px;
+    }
+
+    .product-badge.cream-badge {
+      background: var(--cream);
+      color: var(--black);
+    }
+
+    .product-quick-add {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--black);
+      color: var(--white);
+      text-align: center;
+      padding: 12px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-quick-add { transform: translateY(0); }
+
+    .product-colors { display: flex; gap: 6px; margin-bottom: 8px; }
+
+    .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .color-dot:hover { transform: scale(1.3); }
+    .color-dot.active { border-color: var(--black); }
+
+    .product-name {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .product-sub {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .product-price { font-size: 13px; font-weight: 500; }
+
+    /* ─── FABRIC STRIP ─── */
+    .fabric-strip {
+      background: var(--blue);
+      color: var(--white);
+      padding: 72px 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .fabric-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 16px;
+    }
+
+    .fabric-title {
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .fabric-title em { font-style: italic; color: var(--cream); }
+
+    .fabric-body {
+      font-size: 14px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 32px;
+    }
+
+    .fabric-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .fabric-pill {
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.85);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+    }
+
+    .fabric-visual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .fabric-visual-img {
+      overflow: hidden;
+      background: rgba(255,255,255,0.1);
+      aspect-ratio: 1;
+    }
+
+    .fabric-visual-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
+
+    .fabric-visual-img:first-child { grid-column: span 2; aspect-ratio: 2/1; }
+
+    /* ─── BRAND STATEMENT ─── */
+    .brand-statement {
+      padding: 100px 48px;
+      text-align: center;
+      background: var(--cream);
+    }
+
+    .brand-statement-label {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .brand-statement-text {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 300;
+      line-height: 1.3;
+      max-width: 860px;
+      margin: 0 auto 36px;
+    }
+
+    .brand-statement-text em { font-style: italic; color: var(--blue); }
+
+    /* ─── EDITORIAL ─── */
+    .editorial {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 580px;
+    }
+
+    .editorial-img { overflow: hidden; background: var(--grey); }
+    .editorial-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .editorial-content {
+      background: var(--black);
+      color: var(--white);
+      padding: 80px 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .editorial-content .section-label { color: rgba(255,255,255,0.4); margin-bottom: 24px; }
+
+    .editorial-content h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .editorial-content h2 em { font-style: italic; color: var(--cream); }
+
+    .editorial-content p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 36px;
+      max-width: 400px;
+    }
+
+    /* ─── TESTIMONIALS ─── */
+    .testimonials { padding: 80px 48px; background: var(--grey); }
+
+    .testimonials-header { text-align: center; margin-bottom: 48px; }
+
+    .testimonials-header h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 3vw, 40px);
+      font-weight: 300;
+    }
+
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+    .testimonial-card { background: var(--white); padding: 32px; }
+
+    .stars { color: var(--blue); font-size: 14px; letter-spacing: 2px; margin-bottom: 16px; }
+
+    .testimonial-text {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+
+    /* ─── EMAIL CAPTURE ─── */
+    .email-capture { background: var(--black); color: var(--white); padding: 80px 48px; text-align: center; }
+
+    .email-capture h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 3.5vw, 46px);
+      font-weight: 300;
+      margin-bottom: 12px;
+    }
+
+    .email-capture h2 em { font-style: italic; color: var(--cream); }
+
+    .email-capture p { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 32px; }
+
+    .email-form { display: flex; max-width: 440px; margin: 0 auto; }
+
+    .email-input {
+      flex: 1;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-right: none;
+      color: var(--white);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .email-input::placeholder { color: rgba(255,255,255,0.35); }
+
+    .email-submit {
+      padding: 14px 28px;
+      background: var(--cream);
+      color: var(--black);
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .email-submit:hover { background: var(--blue); color: var(--white); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--black);
+      color: rgba(255,255,255,0.6);
+      padding: 64px 48px 32px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+
+    .footer-brand .footer-logo {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      color: var(--white);
+      margin-bottom: 16px;
+      display: block;
+      text-decoration: none;
+    }
+
+    .footer-brand p { font-size: 12px; line-height: 1.8; margin-bottom: 24px; max-width: 280px; }
+
+    .social-links { display: flex; gap: 12px; }
+
+    .social-link {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .social-link:hover { border-color: var(--cream); color: var(--cream); }
+
+    .footer-col h4 {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--white);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+    .footer-col ul li a {
+      text-decoration: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      transition: color 0.2s;
+    }
+
+    .footer-col ul li a:hover { color: var(--white); }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .footer-bottom-right { display: flex; gap: 24px; }
+
+    .footer-bottom a { color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
+    .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 768px) {
+      .nav-inner { padding: 0 20px; }
+      .nav-left { display: none; }
+      .hero-content { padding: 0 24px 56px; }
+      .category-strip, .products-section { padding: 40px 20px; }
+      .category-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .product-grid { grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+      .fabric-strip { grid-template-columns: 1fr; padding: 48px 20px; }
+      .editorial { grid-template-columns: 1fr; }
+      .editorial-content { padding: 48px 24px; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .brand-statement { padding: 64px 24px; }
+      .email-capture { padding: 56px 20px; }
+      footer { padding: 48px 20px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Announcement -->
+<div class="announcement">Free shipping on orders above AED 250 · Delivered across UAE in 2–3 days</div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+
+    <!-- Left nav items -->
+    <div class="nav-left">
+
+      <!-- Shop dropdown -->
+      <div class="nav-item">
+        <button class="nav-link">
+          Shop
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dropdown dropdown-shop">
+          <div class="dropdown-col">
+            <p class="dropdown-col-title">Category</p>
+            <ul>
+              <li><a href="#" class="highlight">New Arrivals</a></li>
+              <li><a href="#">Leggings</a></li>
+              <li><a href="#">Sports Bras</a></li>
+              <li><a href="#">Shorts</a></li>
+              <li><a href="#">Matching Sets</a></li>
+              <li><a href="#">All Products</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-col">
+            <p class="dropdown-col-title">By Color</p>
+            <ul>
+              <li><a href="#">Onyx Black</a></li>
+              <li><a href="#">Oat Cream</a></li>
+              <li><a href="#">Steel Blue</a></li>
+              <li><a href="#">Rust</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-col">
+            <p class="dropdown-col-title">Featured</p>
+            <ul>
+              <li><a href="#">Bestsellers</a></li>
+              <li><a href="#">Under AED 250</a></li>
+              <li><a href="#">Complete the Look</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-col dropdown-featured">
+            <img src="https://images.unsplash.com/photo-1552196563-55cd4e45efb3?w=400&q=80" alt="New Arrivals" />
+            <div class="dropdown-featured-label">
+              <p>New In</p>
+              <h4>Sculpt Collection</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collections dropdown -->
+      <div class="nav-item">
+        <button class="nav-link">
+          Collections
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dropdown dropdown-simple" style="left:0;transform:translateX(0) translateY(-8px);">
+          <div class="dropdown-col" style="border-right:none;">
+            <p class="dropdown-col-title">Collections</p>
+            <ul>
+              <li><a href="#">High Performance</a></li>
+              <li><a href="#">Studio Ready</a></li>
+              <li><a href="#">Everyday Sculpt</a></li>
+              <li><a href="#">Limited Edition</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <a href="#" class="nav-link">About</a>
+
+    </div>
+
+    <a href="#" class="nav-logo">aeva</a>
+
+    <!-- Right icons -->
+    <div class="nav-right">
+      <a href="#" class="nav-link" style="padding:0;">Size Guide</a>
+      <button class="nav-icon" aria-label="Search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="nav-icon" aria-label="Bag">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        (0)
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-slides">
+    <div class="hero-slide active">
+      <img src="https://images.unsplash.com/photo-1518310952931-b1de897abd40?w=1800&q=80" alt="AEVA activewear" />
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=1800&q=80" alt="AEVA leggings" />
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1800&q=80" alt="AEVA yoga" />
+    </div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">New — Sculpt Collection</p>
+    <h1 class="hero-title">Built for the<br /><em>woman you're</em><br />becoming.</h1>
+    <p class="hero-subtitle">Precision activewear crafted from AEVA Sculpt™ — engineered to move, sculpt, and elevate every form.</p>
+    <div class="hero-cta-row">
+      <a href="#" class="btn-primary">Shop Now</a>
+      <a href="#" class="btn-ghost">Explore All</a>
+    </div>
+  </div>
+  <div class="hero-dots">
+    <div class="hero-dot active" data-index="0"></div>
+    <div class="hero-dot" data-index="1"></div>
+    <div class="hero-dot" data-index="2"></div>
+  </div>
+</section>
+
+<!-- Category Strip -->
+<section class="category-strip">
+  <p class="section-label">Shop by category</p>
+  <div class="category-grid">
+    <a href="#" class="category-card">
+      <img src="https://images.unsplash.com/photo-1552196563-55cd4e45efb3?w=800&q=80" alt="Leggings" />
+      <div class="category-label">
+        <h3>Leggings</h3>
+        <span>5 styles</span>
+      </div>
+    </a>
+    <a href="#" class="category-card">
+      <img src="https://images.unsplash.com/photo-1534258936925-c58bed479fcb?w=800&q=80" alt="Sports Bras" />
+      <div class="category-label">
+        <h3>Sports Bras</h3>
+        <span>4 styles</span>
+      </div>
+    </a>
+    <a href="#" class="category-card">
+      <img src="https://images.unsplash.com/photo-1600881333168-2ef49b341f30?w=800&q=80" alt="Shorts" />
+      <div class="category-label">
+        <h3>Shorts</h3>
+        <span>3 styles</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Products -->
+<section class="products-section">
+  <div class="section-header">
+    <h2 class="section-title">New <em>Arrivals</em></h2>
+    <a href="#" class="view-all">View All</a>
+  </div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterProducts('all', this)">All</button>
+    <button class="filter-tab" onclick="filterProducts('leggings', this)">Leggings</button>
+    <button class="filter-tab" onclick="filterProducts('bras', this)">Sports Bras</button>
+    <button class="filter-tab" onclick="filterProducts('shorts', this)">Shorts</button>
+    <button class="filter-tab" onclick="filterProducts('sets', this)">Sets</button>
+  </div>
+  <div class="product-grid" id="productGrid">
+
+    <a href="#" class="product-card" data-category="leggings">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&q=80" alt="High-Rise Sculpt Legging" />
+        <span class="product-badge">New</span>
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+        <div class="color-dot" style="background:#b87333;" title="Rust"></div>
+      </div>
+      <p class="product-sub">Leggings</p>
+      <h3 class="product-name">High-Rise Sculpt Legging</h3>
+      <p class="product-price">AED 285</p>
+    </a>
+
+    <a href="#" class="product-card" data-category="bras">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1571945192236-f28f1b6b6684?w=600&q=80" alt="Barely-There Bra" />
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+      </div>
+      <p class="product-sub">Sports Bra</p>
+      <h3 class="product-name">Barely-There Bra</h3>
+      <p class="product-price">AED 195</p>
+    </a>
+
+    <a href="#" class="product-card" data-category="leggings">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1518311312815-5b58da9e4b47?w=600&q=80" alt="Mid-Rise Flow Legging" />
+        <span class="product-badge cream-badge">Bestseller</span>
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+      </div>
+      <p class="product-sub">Leggings</p>
+      <h3 class="product-name">Mid-Rise Flow Legging</h3>
+      <p class="product-price">AED 265</p>
+    </a>
+
+    <a href="#" class="product-card" data-category="shorts">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=600&q=80" alt="Sculpt Biker Short" />
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+        <div class="color-dot" style="background:#b87333;" title="Rust"></div>
+      </div>
+      <p class="product-sub">Shorts</p>
+      <h3 class="product-name">Sculpt Biker Short</h3>
+      <p class="product-price">AED 225</p>
+    </a>
+
+    <a href="#" class="product-card" data-category="bras">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1545196405-cb88f41a7d2a?w=600&q=80" alt="Longline Power Bra" />
+        <span class="product-badge">New</span>
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+        <div class="color-dot" style="background:#b87333;" title="Rust"></div>
+      </div>
+      <p class="product-sub">Sports Bra</p>
+      <h3 class="product-name">Longline Power Bra</h3>
+      <p class="product-price">AED 215</p>
+    </a>
+
+    <a href="#" class="product-card" data-category="sets">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=600&q=80" alt="Sculpt Seamless Set" />
+        <span class="product-badge">New</span>
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+      </div>
+      <p class="product-sub">Matching Set</p>
+      <h3 class="product-name">Sculpt Seamless Set</h3>
+      <p class="product-price">AED 460</p>
+    </a>
+
+    <a href="#" class="product-card" data-category="leggings">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1616862239932-f0c95cde9226?w=600&q=80" alt="7/8 Studio Legging" />
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+      </div>
+      <p class="product-sub">Leggings</p>
+      <h3 class="product-name">7/8 Studio Legging</h3>
+      <p class="product-price">AED 275</p>
+    </a>
+
+    <a href="#" class="product-card" data-category="shorts">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1507680434567-5739c80be1ac?w=600&q=80" alt="High-Rise Training Short" />
+        <div class="product-quick-add">Quick Add</div>
+      </div>
+      <div class="product-colors">
+        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
+        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+      </div>
+      <p class="product-sub">Shorts</p>
+      <h3 class="product-name">High-Rise Training Short</h3>
+      <p class="product-price">AED 235</p>
+    </a>
+
+  </div>
+</section>
+
+<!-- Fabric Strip -->
+<section class="fabric-strip">
+  <div>
+    <p class="fabric-eyebrow">Our Technology</p>
+    <h2 class="fabric-title">Meet<br /><em>AEVA Sculpt™</em></h2>
+    <p class="fabric-body">Engineered with 78% Nylon and 22% Spandex, AEVA Sculpt™ is our proprietary fabric system — designed to contour, compress, and breathe in equal measure. The result is a second skin that moves before you do.</p>
+    <div class="fabric-pills">
+      <span class="fabric-pill">4-Way Stretch</span>
+      <span class="fabric-pill">Moisture-Wicking</span>
+      <span class="fabric-pill">Squat-Proof</span>
+      <span class="fabric-pill">Seamless Comfort</span>
+      <span class="fabric-pill">Shape-Retaining</span>
+    </div>
+  </div>
+  <div class="fabric-visual">
+    <div class="fabric-visual-img">
+      <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80" alt="Fabric" />
+    </div>
+    <div class="fabric-visual-img">
+      <img src="https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=800&q=80" alt="Yoga" />
+    </div>
+    <div class="fabric-visual-img">
+      <img src="https://images.unsplash.com/photo-1518310952931-b1de897abd40?w=800&q=80" alt="Active" />
+    </div>
+  </div>
+</section>
+
+<!-- Brand Statement -->
+<section class="brand-statement">
+  <p class="brand-statement-label">Our Story</p>
+  <p class="brand-statement-text">"Founded by women in Dubai who couldn't find activewear that felt like them — <em>always evolving, always alive.</em>"</p>
+  <a href="#" class="btn-primary" style="display:inline-block;">Read Our Story</a>
+</section>
+
+<!-- Editorial -->
+<section class="editorial">
+  <div class="editorial-img">
+    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80" alt="AEVA Editorial" />
+  </div>
+  <div class="editorial-content">
+    <p class="section-label">Matching Sets</p>
+    <h2>Designed to <em>match the moment.</em></h2>
+    <p>Every set is engineered as a system — top and bottom developed together so the stretch, compression, and finish work in perfect harmony. One fit. Endless movements.</p>
+    <a href="#" class="btn-primary">Shop Sets</a>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+  <div class="testimonials-header">
+    <p class="section-label" style="text-align:center;margin-bottom:12px;">Real Women, Real Results</p>
+    <h2>What they're <em style="font-family:var(--font-serif);font-style:italic;color:var(--blue);">saying</em></h2>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"The most flattering leggings I've ever worn. I wore them to pilates and had three women ask where I got them."</p>
+      <p class="testimonial-author">Sarah M. — Dubai</p>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"Finally activewear that doesn't look like gym clothes. I've worn these to brunch, to the studio, everywhere."</p>
+      <p class="testimonial-author">Layla K. — Abu Dhabi</p>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"The fabric is incredible — holds everything in without feeling tight. Worth every dirham."</p>
+      <p class="testimonial-author">Nour A. — Sharjah</p>
+    </div>
+  </div>
+</section>
+
+<!-- Email Capture -->
+<section class="email-capture">
+  <h2>Be the first to <em>know.</em></h2>
+  <p>New drops, early access, and exclusive offers — delivered to you first.</p>
+  <div class="email-form">
+    <input type="email" class="email-input" placeholder="Your email address" />
+    <button class="email-submit">Join</button>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="footer-logo">aeva</a>
+      <p>Premium women's activewear crafted in Dubai. Built for the woman who moves with intention.</p>
+      <div class="social-links">
+        <a href="#" class="social-link" aria-label="Instagram">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="#" class="social-link" aria-label="TikTok">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.77 1.52V6.74a4.85 4.85 0 01-1-.05z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">New Arrivals</a></li>
+        <li><a href="#">Leggings</a></li>
+        <li><a href="#">Sports Bras</a></li>
+        <li><a href="#">Shorts</a></li>
+        <li><a href="#">Matching Sets</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Size Guide</a></li>
+        <li><a href="#">Shipping & Returns</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Track Order</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">Our Story</a></li>
+        <li><a href="#">AEVA Sculpt™</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 AEVA. All rights reserved. Dubai, UAE.</span>
+    <div class="footer-bottom-right">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Hero slideshow
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  let current = 0;
+
+  function goToSlide(n) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(+dot.dataset.index)));
+  setInterval(() => goToSlide((current + 1) % slides.length), 4500);
+
+  // Product filter
+  function filterProducts(category, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.style.display = (category === 'all' || card.dataset.category === category) ? '' : 'none';
+    });
+  }
+
+  // Color dots
+  document.querySelectorAll('.product-colors').forEach(wrap => {
+    wrap.querySelectorAll('.color-dot').forEach(dot => {
+      dot.addEventListener('click', e => {
+        e.preventDefault();
+        wrap.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.nav-item')) {
+      document.querySelectorAll('.dropdown').forEach(d => {
+        d.style.opacity = '';
+        d.style.visibility = '';
+      });
+    }
+  });
+</script>
+</body>
+</html>
