@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -30,6 +31,32 @@
       overflow-x: hidden;
     }
 
+    /* ─── PAGE LOAD FADE ─── */
+    .page-loader {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.2s ease;
+    }
+
+    .page-loader.hidden { opacity: 0; pointer-events: none; }
+
+    .loader-logo-img {
+      height: 56px;
+      width: auto;
+      filter: invert(1);
+      animation: loaderPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loaderPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
     /* ─── ANNOUNCEMENT BAR ─── */
     .announcement {
       background: var(--black);
@@ -40,6 +67,8 @@
       letter-spacing: 0.15em;
       text-transform: uppercase;
       font-weight: 500;
+      position: relative;
+      z-index: 10;
     }
 
     /* ─── NAV ─── */
@@ -47,9 +76,24 @@
       position: sticky;
       top: 0;
       z-index: 200;
-      background: var(--white);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(0,0,0,0.08);
+      transition: background 0.3s;
     }
+
+    nav.over-hero {
+      background: transparent;
+      border-bottom-color: transparent;
+    }
+
+    nav.over-hero .nav-link,
+    nav.over-hero .nav-icon { color: var(--white); }
+
+    nav.over-hero .nav-logo-img { filter: invert(1); }
+
+    nav.over-hero .nav-link:hover { opacity: 0.6; }
 
     .nav-inner {
       display: flex;
@@ -60,22 +104,10 @@
       position: relative;
     }
 
-    .nav-left {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
+    .nav-left { display: flex; gap: 4px; align-items: center; }
+    .nav-right { display: flex; gap: 20px; align-items: center; }
 
-    .nav-right {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    }
-
-    /* Nav items with dropdown trigger */
-    .nav-item {
-      position: relative;
-    }
+    .nav-item { position: relative; }
 
     .nav-link {
       display: flex;
@@ -89,7 +121,7 @@
       font-weight: 500;
       padding: 0 14px;
       height: 64px;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, color 0.3s;
       border: none;
       background: none;
       cursor: pointer;
@@ -97,20 +129,23 @@
     }
 
     .nav-link:hover { opacity: 0.5; }
-
     .nav-link svg { transition: transform 0.2s; }
     .nav-item:hover .nav-link svg { transform: rotate(180deg); }
 
     .nav-logo {
-      font-family: var(--font-serif);
-      font-size: 28px;
-      font-weight: 400;
-      letter-spacing: 0.08em;
-      color: var(--black);
       text-decoration: none;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo-img {
+      height: 32px;
+      width: auto;
+      display: block;
+      transition: filter 0.3s;
     }
 
     .nav-icon {
@@ -126,7 +161,7 @@
       cursor: pointer;
       color: var(--black);
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, color 0.3s;
     }
     .nav-icon:hover { opacity: 0.5; }
 
@@ -135,12 +170,10 @@
       position: absolute;
       top: 64px;
       left: 50%;
-      transform: translateX(-50%);
       background: var(--white);
       border-top: 2px solid var(--black);
       box-shadow: 0 12px 40px rgba(0,0,0,0.1);
       display: grid;
-      gap: 0;
       min-width: 680px;
       opacity: 0;
       visibility: hidden;
@@ -156,12 +189,8 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Shop dropdown — 4 col */
-    .dropdown-shop {
-      grid-template-columns: repeat(4, 1fr);
-    }
+    .dropdown-shop { grid-template-columns: repeat(4, 1fr); }
 
-    /* Simple dropdown — 1 col */
     .dropdown-simple {
       grid-template-columns: 1fr;
       min-width: 220px;
@@ -169,9 +198,7 @@
       transform: translateX(0) translateY(-8px);
     }
 
-    .nav-item:hover .dropdown-simple {
-      transform: translateX(0) translateY(0);
-    }
+    .nav-item:hover .dropdown-simple { transform: translateX(0) translateY(0); }
 
     .dropdown-col {
       padding: 32px 28px;
@@ -191,12 +218,7 @@
       border-bottom: 1px solid rgba(0,0,0,0.07);
     }
 
-    .dropdown-col ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .dropdown-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 
     .dropdown-col ul li a {
       text-decoration: none;
@@ -207,22 +229,10 @@
       display: block;
     }
 
-    .dropdown-col ul li a:hover {
-      color: var(--blue);
-      padding-left: 4px;
-    }
+    .dropdown-col ul li a:hover { color: var(--blue); padding-left: 4px; }
+    .dropdown-col ul li a.highlight { color: var(--blue); font-weight: 500; }
 
-    .dropdown-col ul li a.highlight {
-      color: var(--blue);
-      font-weight: 500;
-    }
-
-    /* Dropdown featured image col */
-    .dropdown-featured {
-      padding: 0;
-      overflow: hidden;
-      position: relative;
-    }
+    .dropdown-featured { padding: 0; overflow: hidden; position: relative; }
 
     .dropdown-featured img {
       width: 100%;
@@ -256,125 +266,166 @@
       font-weight: 300;
     }
 
-    /* ─── HERO ─── */
+    /* ─── HERO 3D ─── */
     .hero {
       position: relative;
-      height: 92vh;
-      min-height: 600px;
+      height: 100vh;
+      min-height: 640px;
       overflow: hidden;
       display: flex;
       align-items: flex-end;
-      background: var(--black);
+      background: #06080f;
     }
 
-    .hero-slides { position: absolute; inset: 0; }
-
-    .hero-slide {
+    #hero-canvas {
       position: absolute;
       inset: 0;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    .hero-slide.active { opacity: 1; }
-
-    .hero-slide img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: center top;
-      filter: brightness(0.6);
+      z-index: 1;
+    }
+
+    /* Subtle vignette overlay */
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        radial-gradient(ellipse at center, transparent 40%, rgba(6,8,15,0.7) 100%),
+        linear-gradient(to top, rgba(6,8,15,0.85) 0%, transparent 50%);
+      pointer-events: none;
     }
 
     .hero-content {
       position: relative;
-      z-index: 2;
-      padding: 0 64px 72px;
-      max-width: 680px;
+      z-index: 3;
+      padding: 0 80px 80px;
+      max-width: 720px;
+      will-change: transform;
     }
 
     .hero-eyebrow {
       font-size: 10px;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--cream);
-      opacity: 0.8;
-      margin-bottom: 16px;
+      opacity: 0;
+      margin-bottom: 20px;
+      transform: translateY(20px);
+      animation: fadeUp 1s ease 1.4s forwards;
     }
 
     .hero-title {
       font-family: var(--font-serif);
-      font-size: clamp(48px, 6vw, 88px);
+      font-size: clamp(52px, 6.5vw, 96px);
       font-weight: 300;
       color: var(--white);
-      line-height: 1.05;
-      margin-bottom: 24px;
+      line-height: 1.02;
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 1.1s ease 1.6s forwards;
     }
 
-    .hero-title em { font-style: italic; color: var(--cream); }
+    .hero-title em {
+      font-style: italic;
+      color: var(--cream);
+    }
 
     .hero-subtitle {
       font-size: 13px;
-      color: rgba(255,255,255,0.75);
-      letter-spacing: 0.04em;
-      line-height: 1.7;
-      margin-bottom: 36px;
-      max-width: 420px;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.05em;
+      line-height: 1.8;
+      margin-bottom: 40px;
+      max-width: 400px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 1s ease 1.85s forwards;
     }
 
-    .hero-cta-row { display: flex; gap: 16px; align-items: center; }
+    .hero-cta-row {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 1s ease 2.05s forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .btn-primary {
       background: var(--cream);
       color: var(--black);
-      padding: 14px 36px;
+      padding: 15px 40px;
       font-family: var(--font-sans);
       font-size: 11px;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       font-weight: 600;
       text-decoration: none;
       border: none;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.25s, color 0.25s, transform 0.25s;
       display: inline-block;
     }
 
-    .btn-primary:hover { background: var(--blue); color: var(--white); }
+    .btn-primary:hover {
+      background: var(--blue);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
 
     .btn-ghost {
-      color: var(--white);
+      color: rgba(255,255,255,0.75);
       font-size: 11px;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       font-weight: 500;
       text-decoration: none;
-      border-bottom: 1px solid rgba(255,255,255,0.4);
+      border-bottom: 1px solid rgba(255,255,255,0.3);
       padding-bottom: 2px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, color 0.2s;
     }
 
-    .btn-ghost:hover { border-color: var(--white); }
+    .btn-ghost:hover { border-color: var(--white); color: var(--white); }
 
-    .hero-dots {
+    /* Scroll indicator */
+    .scroll-indicator {
       position: absolute;
-      bottom: 32px;
-      right: 64px;
-      display: flex;
-      gap: 8px;
+      bottom: 36px;
+      right: 80px;
       z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeUp 1s ease 2.4s forwards;
     }
 
-    .hero-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.35);
-      cursor: pointer;
-      transition: background 0.3s;
+    .scroll-indicator span {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      writing-mode: vertical-rl;
     }
 
-    .hero-dot.active { background: var(--cream); }
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+      animation: scrollPulse 2s ease-in-out infinite 3s;
+    }
+
+    @keyframes scrollPulse {
+      0% { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(0.3); opacity: 0; }
+    }
 
     /* ─── CATEGORY STRIP ─── */
     .category-strip { background: var(--grey); padding: 56px 48px; }
@@ -401,7 +452,10 @@
       text-decoration: none;
       aspect-ratio: 3/4;
       background: var(--black);
+      transition: transform 0.4s ease;
     }
+
+    .category-card:hover { transform: translateY(-6px); }
 
     .category-card img {
       width: 100%;
@@ -507,7 +561,10 @@
       cursor: pointer;
       text-decoration: none;
       color: inherit;
+      transition: transform 0.3s ease;
     }
+
+    .product-card:hover { transform: translateY(-4px); }
 
     .product-img-wrap {
       position: relative;
@@ -539,10 +596,7 @@
       padding: 4px 10px;
     }
 
-    .product-badge.cream-badge {
-      background: var(--cream);
-      color: var(--black);
-    }
+    .product-badge.cream-badge { background: var(--cream); color: var(--black); }
 
     .product-quick-add {
       position: absolute;
@@ -641,28 +695,14 @@
       padding: 8px 16px;
     }
 
-    .fabric-visual {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .fabric-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    .fabric-visual-img {
-      overflow: hidden;
-      background: rgba(255,255,255,0.1);
-      aspect-ratio: 1;
-    }
-
+    .fabric-visual-img { overflow: hidden; background: rgba(255,255,255,0.1); aspect-ratio: 1; }
     .fabric-visual-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
-
     .fabric-visual-img:first-child { grid-column: span 2; aspect-ratio: 2/1; }
 
     /* ─── BRAND STATEMENT ─── */
-    .brand-statement {
-      padding: 100px 48px;
-      text-align: center;
-      background: var(--cream);
-    }
+    .brand-statement { padding: 100px 48px; text-align: center; background: var(--cream); }
 
     .brand-statement-label {
       font-size: 10px;
@@ -684,12 +724,7 @@
     .brand-statement-text em { font-style: italic; color: var(--blue); }
 
     /* ─── EDITORIAL ─── */
-    .editorial {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 580px;
-    }
-
+    .editorial { display: grid; grid-template-columns: 1fr 1fr; min-height: 580px; }
     .editorial-img { overflow: hidden; background: var(--grey); }
     .editorial-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -724,7 +759,6 @@
 
     /* ─── TESTIMONIALS ─── */
     .testimonials { padding: 80px 48px; background: var(--grey); }
-
     .testimonials-header { text-align: center; margin-bottom: 48px; }
 
     .testimonials-header h2 {
@@ -749,7 +783,7 @@
 
     .testimonial-author { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
 
-    /* ─── EMAIL CAPTURE ─── */
+    /* ─── EMAIL ─── */
     .email-capture { background: var(--black); color: var(--white); padding: 80px 48px; text-align: center; }
 
     .email-capture h2 {
@@ -760,7 +794,6 @@
     }
 
     .email-capture h2 em { font-style: italic; color: var(--cream); }
-
     .email-capture p { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 32px; }
 
     .email-form { display: flex; max-width: 440px; margin: 0 auto; }
@@ -803,20 +836,18 @@
       border-top: 1px solid rgba(255,255,255,0.06);
     }
 
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 48px;
-      margin-bottom: 56px;
-    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 56px; }
 
     .footer-brand .footer-logo {
-      font-family: var(--font-serif);
-      font-size: 24px;
-      color: var(--white);
-      margin-bottom: 16px;
       display: block;
       text-decoration: none;
+      margin-bottom: 20px;
+    }
+
+    .footer-logo-img {
+      height: 28px;
+      width: auto;
+      filter: invert(1);
     }
 
     .footer-brand p { font-size: 12px; line-height: 1.8; margin-bottom: 24px; max-width: 280px; }
@@ -867,15 +898,24 @@
     }
 
     .footer-bottom-right { display: flex; gap: 24px; }
-
     .footer-bottom a { color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
     .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
     /* ─── MOBILE ─── */
     @media (max-width: 768px) {
       .nav-inner { padding: 0 20px; }
       .nav-left { display: none; }
-      .hero-content { padding: 0 24px 56px; }
+      .hero-content { padding: 0 28px 60px; }
+      .scroll-indicator { display: none; }
       .category-strip, .products-section { padding: 40px 20px; }
       .category-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
       .product-grid { grid-template-columns: 1fr 1fr; gap: 16px 12px; }
@@ -892,17 +932,18 @@
 </head>
 <body>
 
+<!-- Page Loader -->
+<div class="page-loader" id="pageLoader">
+  <img src="logo-dark.png" class="loader-logo-img" alt="AEVA" />
+</div>
+
 <!-- Announcement -->
 <div class="announcement">Free shipping on orders above AED 250 · Delivered across UAE in 2–3 days</div>
 
 <!-- Nav -->
-<nav>
+<nav id="mainNav">
   <div class="nav-inner">
-
-    <!-- Left nav items -->
     <div class="nav-left">
-
-      <!-- Shop dropdown -->
       <div class="nav-item">
         <button class="nav-link">
           Shop
@@ -946,14 +987,12 @@
           </div>
         </div>
       </div>
-
-      <!-- Collections dropdown -->
       <div class="nav-item">
         <button class="nav-link">
           Collections
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="dropdown dropdown-simple" style="left:0;transform:translateX(0) translateY(-8px);">
+        <div class="dropdown dropdown-simple">
           <div class="dropdown-col" style="border-right:none;">
             <p class="dropdown-col-title">Collections</p>
             <ul>
@@ -965,42 +1004,30 @@
           </div>
         </div>
       </div>
-
       <a href="#" class="nav-link">About</a>
-
     </div>
 
-    <a href="#" class="nav-logo">aeva</a>
+    <a href="#" class="nav-logo"><img src="logo-dark.png" class="nav-logo-img" alt="AEVA" /></a>
 
-    <!-- Right icons -->
     <div class="nav-right">
-      <a href="#" class="nav-link" style="padding:0;">Size Guide</a>
-      <button class="nav-icon" aria-label="Search">
+      <a href="#" class="nav-link" style="padding:0; height:auto;">Size Guide</a>
+      <button class="nav-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-      <button class="nav-icon" aria-label="Bag">
+      <button class="nav-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         (0)
       </button>
     </div>
-
   </div>
 </nav>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="hero-slides">
-    <div class="hero-slide active">
-      <img src="https://images.unsplash.com/photo-1518310952931-b1de897abd40?w=1800&q=80" alt="AEVA activewear" />
-    </div>
-    <div class="hero-slide">
-      <img src="https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=1800&q=80" alt="AEVA leggings" />
-    </div>
-    <div class="hero-slide">
-      <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1800&q=80" alt="AEVA yoga" />
-    </div>
-  </div>
-  <div class="hero-content">
+<!-- ─── 3D HERO ─── -->
+<section class="hero" id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-vignette"></div>
+
+  <div class="hero-content" id="heroContent">
     <p class="hero-eyebrow">New — Sculpt Collection</p>
     <h1 class="hero-title">Built for the<br /><em>woman you're</em><br />becoming.</h1>
     <p class="hero-subtitle">Precision activewear crafted from AEVA Sculpt™ — engineered to move, sculpt, and elevate every form.</p>
@@ -1009,183 +1036,165 @@
       <a href="#" class="btn-ghost">Explore All</a>
     </div>
   </div>
-  <div class="hero-dots">
-    <div class="hero-dot active" data-index="0"></div>
-    <div class="hero-dot" data-index="1"></div>
-    <div class="hero-dot" data-index="2"></div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
   </div>
 </section>
 
 <!-- Category Strip -->
-<section class="category-strip">
+<section class="category-strip reveal">
   <p class="section-label">Shop by category</p>
   <div class="category-grid">
     <a href="#" class="category-card">
       <img src="https://images.unsplash.com/photo-1552196563-55cd4e45efb3?w=800&q=80" alt="Leggings" />
-      <div class="category-label">
-        <h3>Leggings</h3>
-        <span>5 styles</span>
-      </div>
+      <div class="category-label"><h3>Leggings</h3><span>5 styles</span></div>
     </a>
     <a href="#" class="category-card">
       <img src="https://images.unsplash.com/photo-1534258936925-c58bed479fcb?w=800&q=80" alt="Sports Bras" />
-      <div class="category-label">
-        <h3>Sports Bras</h3>
-        <span>4 styles</span>
-      </div>
+      <div class="category-label"><h3>Sports Bras</h3><span>4 styles</span></div>
     </a>
     <a href="#" class="category-card">
       <img src="https://images.unsplash.com/photo-1600881333168-2ef49b341f30?w=800&q=80" alt="Shorts" />
-      <div class="category-label">
-        <h3>Shorts</h3>
-        <span>3 styles</span>
-      </div>
+      <div class="category-label"><h3>Shorts</h3><span>3 styles</span></div>
     </a>
   </div>
 </section>
 
 <!-- Products -->
 <section class="products-section">
-  <div class="section-header">
+  <div class="section-header reveal">
     <h2 class="section-title">New <em>Arrivals</em></h2>
     <a href="#" class="view-all">View All</a>
   </div>
-  <div class="filter-tabs">
+  <div class="filter-tabs reveal">
     <button class="filter-tab active" onclick="filterProducts('all', this)">All</button>
     <button class="filter-tab" onclick="filterProducts('leggings', this)">Leggings</button>
     <button class="filter-tab" onclick="filterProducts('bras', this)">Sports Bras</button>
     <button class="filter-tab" onclick="filterProducts('shorts', this)">Shorts</button>
     <button class="filter-tab" onclick="filterProducts('sets', this)">Sets</button>
   </div>
-  <div class="product-grid" id="productGrid">
-
-    <a href="#" class="product-card" data-category="leggings">
+  <div class="product-grid">
+    <a href="#" class="product-card reveal" data-category="leggings">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&q=80" alt="High-Rise Sculpt Legging" />
         <span class="product-badge">New</span>
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
-        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
-        <div class="color-dot" style="background:#b87333;" title="Rust"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#f5f0e8;"></div>
+        <div class="color-dot" style="background:#4a7bbf;"></div>
+        <div class="color-dot" style="background:#b87333;"></div>
       </div>
       <p class="product-sub">Leggings</p>
       <h3 class="product-name">High-Rise Sculpt Legging</h3>
       <p class="product-price">AED 285</p>
     </a>
-
-    <a href="#" class="product-card" data-category="bras">
+    <a href="#" class="product-card reveal" data-category="bras">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1571945192236-f28f1b6b6684?w=600&q=80" alt="Barely-There Bra" />
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
-        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#f5f0e8;"></div>
+        <div class="color-dot" style="background:#4a7bbf;"></div>
       </div>
       <p class="product-sub">Sports Bra</p>
       <h3 class="product-name">Barely-There Bra</h3>
       <p class="product-price">AED 195</p>
     </a>
-
-    <a href="#" class="product-card" data-category="leggings">
+    <a href="#" class="product-card reveal" data-category="leggings">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1518311312815-5b58da9e4b47?w=600&q=80" alt="Mid-Rise Flow Legging" />
         <span class="product-badge cream-badge">Bestseller</span>
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#f5f0e8;"></div>
       </div>
       <p class="product-sub">Leggings</p>
       <h3 class="product-name">Mid-Rise Flow Legging</h3>
       <p class="product-price">AED 265</p>
     </a>
-
-    <a href="#" class="product-card" data-category="shorts">
+    <a href="#" class="product-card reveal" data-category="shorts">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=600&q=80" alt="Sculpt Biker Short" />
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
-        <div class="color-dot" style="background:#b87333;" title="Rust"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#f5f0e8;"></div>
+        <div class="color-dot" style="background:#b87333;"></div>
       </div>
       <p class="product-sub">Shorts</p>
       <h3 class="product-name">Sculpt Biker Short</h3>
       <p class="product-price">AED 225</p>
     </a>
-
-    <a href="#" class="product-card" data-category="bras">
+    <a href="#" class="product-card reveal" data-category="bras">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1545196405-cb88f41a7d2a?w=600&q=80" alt="Longline Power Bra" />
         <span class="product-badge">New</span>
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
-        <div class="color-dot" style="background:#b87333;" title="Rust"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#4a7bbf;"></div>
+        <div class="color-dot" style="background:#b87333;"></div>
       </div>
       <p class="product-sub">Sports Bra</p>
       <h3 class="product-name">Longline Power Bra</h3>
       <p class="product-price">AED 215</p>
     </a>
-
-    <a href="#" class="product-card" data-category="sets">
+    <a href="#" class="product-card reveal" data-category="sets">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=600&q=80" alt="Sculpt Seamless Set" />
         <span class="product-badge">New</span>
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#f5f0e8;"></div>
       </div>
       <p class="product-sub">Matching Set</p>
       <h3 class="product-name">Sculpt Seamless Set</h3>
       <p class="product-price">AED 460</p>
     </a>
-
-    <a href="#" class="product-card" data-category="leggings">
+    <a href="#" class="product-card reveal" data-category="leggings">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1616862239932-f0c95cde9226?w=600&q=80" alt="7/8 Studio Legging" />
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#4a7bbf;"></div>
       </div>
       <p class="product-sub">Leggings</p>
       <h3 class="product-name">7/8 Studio Legging</h3>
       <p class="product-price">AED 275</p>
     </a>
-
-    <a href="#" class="product-card" data-category="shorts">
+    <a href="#" class="product-card reveal" data-category="shorts">
       <div class="product-img-wrap">
         <img src="https://images.unsplash.com/photo-1507680434567-5739c80be1ac?w=600&q=80" alt="High-Rise Training Short" />
         <div class="product-quick-add">Quick Add</div>
       </div>
       <div class="product-colors">
-        <div class="color-dot active" style="background:#1a1a1a;" title="Onyx Black"></div>
-        <div class="color-dot" style="background:#f5f0e8;" title="Oat Cream"></div>
-        <div class="color-dot" style="background:#4a7bbf;" title="Steel Blue"></div>
+        <div class="color-dot active" style="background:#1a1a1a;"></div>
+        <div class="color-dot" style="background:#f5f0e8;"></div>
+        <div class="color-dot" style="background:#4a7bbf;"></div>
       </div>
       <p class="product-sub">Shorts</p>
       <h3 class="product-name">High-Rise Training Short</h3>
       <p class="product-price">AED 235</p>
     </a>
-
   </div>
 </section>
 
 <!-- Fabric Strip -->
-<section class="fabric-strip">
+<section class="fabric-strip reveal">
   <div>
     <p class="fabric-eyebrow">Our Technology</p>
     <h2 class="fabric-title">Meet<br /><em>AEVA Sculpt™</em></h2>
@@ -1199,27 +1208,21 @@
     </div>
   </div>
   <div class="fabric-visual">
-    <div class="fabric-visual-img">
-      <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80" alt="Fabric" />
-    </div>
-    <div class="fabric-visual-img">
-      <img src="https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=800&q=80" alt="Yoga" />
-    </div>
-    <div class="fabric-visual-img">
-      <img src="https://images.unsplash.com/photo-1518310952931-b1de897abd40?w=800&q=80" alt="Active" />
-    </div>
+    <div class="fabric-visual-img"><img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80" alt="Fabric" /></div>
+    <div class="fabric-visual-img"><img src="https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=800&q=80" alt="Yoga" /></div>
+    <div class="fabric-visual-img"><img src="https://images.unsplash.com/photo-1518310952931-b1de897abd40?w=800&q=80" alt="Active" /></div>
   </div>
 </section>
 
 <!-- Brand Statement -->
-<section class="brand-statement">
+<section class="brand-statement reveal">
   <p class="brand-statement-label">Our Story</p>
   <p class="brand-statement-text">"Founded by women in Dubai who couldn't find activewear that felt like them — <em>always evolving, always alive.</em>"</p>
   <a href="#" class="btn-primary" style="display:inline-block;">Read Our Story</a>
 </section>
 
 <!-- Editorial -->
-<section class="editorial">
+<section class="editorial reveal">
   <div class="editorial-img">
     <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80" alt="AEVA Editorial" />
   </div>
@@ -1233,22 +1236,22 @@
 
 <!-- Testimonials -->
 <section class="testimonials">
-  <div class="testimonials-header">
+  <div class="testimonials-header reveal">
     <p class="section-label" style="text-align:center;margin-bottom:12px;">Real Women, Real Results</p>
     <h2>What they're <em style="font-family:var(--font-serif);font-style:italic;color:var(--blue);">saying</em></h2>
   </div>
   <div class="testimonials-grid">
-    <div class="testimonial-card">
+    <div class="testimonial-card reveal">
       <div class="stars">★★★★★</div>
       <p class="testimonial-text">"The most flattering leggings I've ever worn. I wore them to pilates and had three women ask where I got them."</p>
       <p class="testimonial-author">Sarah M. — Dubai</p>
     </div>
-    <div class="testimonial-card">
+    <div class="testimonial-card reveal">
       <div class="stars">★★★★★</div>
       <p class="testimonial-text">"Finally activewear that doesn't look like gym clothes. I've worn these to brunch, to the studio, everywhere."</p>
       <p class="testimonial-author">Layla K. — Abu Dhabi</p>
     </div>
-    <div class="testimonial-card">
+    <div class="testimonial-card reveal">
       <div class="stars">★★★★★</div>
       <p class="testimonial-text">"The fabric is incredible — holds everything in without feeling tight. Worth every dirham."</p>
       <p class="testimonial-author">Nour A. — Sharjah</p>
@@ -1256,8 +1259,8 @@
   </div>
 </section>
 
-<!-- Email Capture -->
-<section class="email-capture">
+<!-- Email -->
+<section class="email-capture reveal">
   <h2>Be the first to <em>know.</em></h2>
   <p>New drops, early access, and exclusive offers — delivered to you first.</p>
   <div class="email-form">
@@ -1270,13 +1273,13 @@
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
-      <a href="#" class="footer-logo">aeva</a>
+      <a href="#" class="footer-logo"><img src="logo-dark.png" class="footer-logo-img" alt="AEVA" /></a>
       <p>Premium women's activewear crafted in Dubai. Built for the woman who moves with intention.</p>
       <div class="social-links">
-        <a href="#" class="social-link" aria-label="Instagram">
+        <a href="#" class="social-link">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
         </a>
-        <a href="#" class="social-link" aria-label="TikTok">
+        <a href="#" class="social-link">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.77 1.52V6.74a4.85 4.85 0 01-1-.05z"/></svg>
         </a>
       </div>
@@ -1322,51 +1325,278 @@
 </footer>
 
 <script>
-  // Hero slideshow
-  const slides = document.querySelectorAll('.hero-slide');
-  const dots = document.querySelectorAll('.hero-dot');
-  let current = 0;
+// ─────────────────────────────────────────
+// PAGE LOADER
+// ─────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('pageLoader').classList.add('hidden');
+    setTimeout(() => document.getElementById('pageLoader').remove(), 1400);
+  }, 900);
+});
 
-  function goToSlide(n) {
-    slides[current].classList.remove('active');
-    dots[current].classList.remove('active');
-    current = n;
-    slides[current].classList.add('active');
-    dots[current].classList.add('active');
+// ─────────────────────────────────────────
+// NAV — transparent over hero, solid after
+// ─────────────────────────────────────────
+const nav = document.getElementById('mainNav');
+const hero = document.getElementById('hero');
+
+function updateNav() {
+  const heroBottom = hero.getBoundingClientRect().bottom;
+  if (heroBottom > 64) {
+    nav.classList.add('over-hero');
+  } else {
+    nav.classList.remove('over-hero');
   }
+}
 
-  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(+dot.dataset.index)));
-  setInterval(() => goToSlide((current + 1) % slides.length), 4500);
+// Start transparent
+nav.classList.add('over-hero');
+window.addEventListener('scroll', updateNav, { passive: true });
 
-  // Product filter
-  function filterProducts(category, btn) {
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.product-card').forEach(card => {
-      card.style.display = (category === 'all' || card.dataset.category === category) ? '' : 'none';
-    });
-  }
+// ─────────────────────────────────────────
+// THREE.JS 3D HERO
+// ─────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+  renderer.setClearColor(0x06080f, 1);
 
-  // Color dots
-  document.querySelectorAll('.product-colors').forEach(wrap => {
-    wrap.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', e => {
-        e.preventDefault();
-        wrap.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-      });
-    });
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x06080f, 0.035);
+
+  const camera = new THREE.PerspectiveCamera(60, canvas.offsetWidth / canvas.offsetHeight, 0.1, 100);
+  camera.position.set(0, 0, 5);
+
+  // ── Lighting ──
+  const ambientLight = new THREE.AmbientLight(0x1a1a2e, 1.5);
+  scene.add(ambientLight);
+
+  // Warm cream key light from upper left
+  const keyLight = new THREE.PointLight(0xfff2bd, 3.5, 20);
+  keyLight.position.set(-4, 4, 3);
+  scene.add(keyLight);
+
+  // Cool blue fill light from right
+  const fillLight = new THREE.PointLight(0x285ccc, 2.0, 20);
+  fillLight.position.set(5, -2, 2);
+  scene.add(fillLight);
+
+  // Rim light from behind
+  const rimLight = new THREE.PointLight(0x4080ff, 1.2, 15);
+  rimLight.position.set(0, 3, -4);
+  scene.add(rimLight);
+
+  // ── Silk cloth mesh ──
+  const CLOTH_W = 80;
+  const CLOTH_H = 60;
+  const clothGeo = new THREE.PlaneGeometry(14, 10, CLOTH_W, CLOTH_H);
+
+  // Store original positions for wave animation
+  const posAttr = clothGeo.attributes.position;
+  const origPos = new Float32Array(posAttr.array);
+
+  const clothMat = new THREE.MeshStandardMaterial({
+    color: 0x1a1f2e,
+    metalness: 0.12,
+    roughness: 0.55,
+    side: THREE.DoubleSide,
+    envMapIntensity: 0.8,
   });
 
-  // Close dropdowns when clicking outside
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.nav-item')) {
-      document.querySelectorAll('.dropdown').forEach(d => {
-        d.style.opacity = '';
-        d.style.visibility = '';
-      });
+  const cloth = new THREE.Mesh(clothGeo, clothMat);
+  cloth.rotation.x = -0.18;
+  cloth.rotation.y = 0.1;
+  cloth.position.z = -0.5;
+  scene.add(cloth);
+
+  // ── Floating particles (cream dust) ──
+  const PARTICLE_COUNT = 280;
+  const pGeo = new THREE.BufferGeometry();
+  const pPositions = new Float32Array(PARTICLE_COUNT * 3);
+  const pSpeeds = new Float32Array(PARTICLE_COUNT);
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    pPositions[i * 3]     = (Math.random() - 0.5) * 18;
+    pPositions[i * 3 + 1] = (Math.random() - 0.5) * 12;
+    pPositions[i * 3 + 2] = (Math.random() - 0.5) * 6;
+    pSpeeds[i] = 0.0008 + Math.random() * 0.0012;
+  }
+
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+
+  const pMat = new THREE.PointsMaterial({
+    color: 0xfff2bd,
+    size: 0.022,
+    transparent: true,
+    opacity: 0.55,
+    sizeAttenuation: true,
+  });
+
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // ── Second layer: blue particles ──
+  const bGeo = new THREE.BufferGeometry();
+  const bPositions = new Float32Array(120 * 3);
+  const bSpeeds = new Float32Array(120);
+
+  for (let i = 0; i < 120; i++) {
+    bPositions[i * 3]     = (Math.random() - 0.5) * 20;
+    bPositions[i * 3 + 1] = (Math.random() - 0.5) * 14;
+    bPositions[i * 3 + 2] = (Math.random() - 0.5) * 5;
+    bSpeeds[i] = 0.0005 + Math.random() * 0.001;
+  }
+
+  bGeo.setAttribute('position', new THREE.BufferAttribute(bPositions, 3));
+
+  const bMat = new THREE.PointsMaterial({
+    color: 0x285ccc,
+    size: 0.03,
+    transparent: true,
+    opacity: 0.3,
+    sizeAttenuation: true,
+  });
+
+  const blueParticles = new THREE.Points(bGeo, bMat);
+  scene.add(blueParticles);
+
+  // ── Mouse tracking ──
+  let mouseX = 0, mouseY = 0;
+  let targetX = 0, targetY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  // Parallax on hero text
+  const heroContent = document.getElementById('heroContent');
+
+  // ── Animate ──
+  let t = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.004;
+
+    // Smooth mouse follow
+    targetX += (mouseX - targetX) * 0.035;
+    targetY += (mouseY - targetY) * 0.035;
+
+    // Camera subtle drift with mouse
+    camera.position.x += (targetX * 0.4 - camera.position.x) * 0.05;
+    camera.position.y += (targetY * 0.25 - camera.position.y) * 0.05;
+    camera.lookAt(0, 0, 0);
+
+    // Silk wave animation
+    for (let i = 0; i < posAttr.count; i++) {
+      const ox = origPos[i * 3];
+      const oy = origPos[i * 3 + 1];
+      const wave =
+        Math.sin(ox * 0.6 + t * 0.9) * 0.18 +
+        Math.sin(oy * 0.5 + t * 0.7) * 0.14 +
+        Math.sin((ox + oy) * 0.4 + t * 1.1) * 0.1 +
+        Math.sin(ox * 1.2 - t * 0.5) * 0.06;
+      posAttr.setZ(i, wave);
+    }
+    posAttr.needsUpdate = true;
+    clothGeo.computeVertexNormals();
+
+    // Cloth gentle rotation with mouse
+    cloth.rotation.y = 0.1 + targetX * 0.08;
+    cloth.rotation.x = -0.18 + targetY * 0.05;
+
+    // Lights pulse subtly
+    keyLight.intensity = 3.5 + Math.sin(t * 0.8) * 0.4;
+    fillLight.intensity = 2.0 + Math.sin(t * 0.6 + 1.2) * 0.3;
+
+    // Key light slow orbit
+    keyLight.position.x = -4 + Math.sin(t * 0.3) * 1.5;
+    keyLight.position.y = 4 + Math.cos(t * 0.25) * 1.0;
+
+    // Cream particles drift upward slowly
+    const pPos = particles.geometry.attributes.position;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      pPos.array[i * 3 + 1] += pSpeeds[i];
+      if (pPos.array[i * 3 + 1] > 7) {
+        pPos.array[i * 3 + 1] = -7;
+        pPos.array[i * 3]     = (Math.random() - 0.5) * 18;
+      }
+      pPos.array[i * 3] += Math.sin(t + i) * 0.0004;
+    }
+    pPos.needsUpdate = true;
+
+    // Blue particles drift differently
+    const bPos = blueParticles.geometry.attributes.position;
+    for (let i = 0; i < 120; i++) {
+      bPos.array[i * 3 + 1] -= bSpeeds[i] * 0.5;
+      if (bPos.array[i * 3 + 1] < -8) {
+        bPos.array[i * 3 + 1] = 8;
+        bPos.array[i * 3]     = (Math.random() - 0.5) * 20;
+      }
+    }
+    bPos.needsUpdate = true;
+
+    // Parallax on hero text (subtle depth)
+    if (heroContent) {
+      heroContent.style.transform = `translate(${targetX * -8}px, ${targetY * -5}px)`;
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // ── Resize ──
+  window.addEventListener('resize', () => {
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+})();
+
+// ─────────────────────────────────────────
+// SCROLL REVEAL
+// ─────────────────────────────────────────
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
     }
   });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ─────────────────────────────────────────
+// PRODUCT FILTER
+// ─────────────────────────────────────────
+function filterProducts(category, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.product-card').forEach(card => {
+    card.style.display = (category === 'all' || card.dataset.category === category) ? '' : 'none';
+  });
+}
+
+// ─────────────────────────────────────────
+// COLOR DOTS
+// ─────────────────────────────────────────
+document.querySelectorAll('.product-colors').forEach(wrap => {
+  wrap.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', e => {
+      e.preventDefault();
+      wrap.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+    });
+  });
+});
 </script>
 </body>
 </html>
